@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nimbus · AI Triage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- animated aurora backdrop -->
+  <div class="aurora">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">◈</div>
+      <div class="brand-text">
+        <h1>Nimbus Triage</h1>
+        <p>Local multi-agent support · routed live by LangGraph</p>
+      </div>
+    </div>
+    <div class="status" id="status">
+      <span class="status-dot"></span>
+      <span id="status-text">connecting…</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ── Chat column ─────────────────────────────────────────── -->
+    <section class="chat-panel glass">
+      <div class="messages" id="messages">
+        <div class="welcome" id="welcome">
+          <div class="welcome-mark">◈</div>
+          <h2>How can we help today?</h2>
+          <p>Ask anything — your message is classified, routed to the right
+             specialist, and answered from that team's knowledge base. Tricky or
+             upset? It's escalated to a human.</p>
+          <div class="suggestions" id="suggestions">
+            <button class="chip" data-q="I was charged twice this month, can I get a refund?">💳 Double charge refund</button>
+            <button class="chip" data-q="I can't log in, it says my account is locked.">🛠 Account locked</button>
+            <button class="chip" data-q="What are your support hours and where are you based?">💬 Support hours</button>
+            <button class="chip" data-q="This is the third time it's broken and I'm furious. I want a human now.">🚨 Escalate to human</button>
+          </div>
+        </div>
+      </div>
+
+      <form class="composer" id="composer">
+        <textarea id="input" rows="1" placeholder="Describe your issue…" autocomplete="off"></textarea>
+        <button type="submit" id="send" class="send" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M3.4 20.4l17.45-7.48a1 1 0 0 0 0-1.84L3.4 3.6a1 1 0 0 0-1.39 1.2L4 11l11 1-11 1-1.98 6.2a1 1 0 0 0 1.39 1.2z"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- ── Live routing panel ──────────────────────────────────── -->
+    <aside class="routing-panel glass">
+      <div class="panel-head">
+        <h3>Live Routing</h3>
+        <span class="panel-tag" id="route-state">idle</span>
+      </div>
+
+      <!-- detected category -->
+      <div class="category-card" id="category-card">
+        <div class="cat-emoji" id="cat-emoji">◈</div>
+        <div class="cat-info">
+          <span class="cat-name" id="cat-name">Awaiting message</span>
+          <span class="cat-sub" id="cat-sub">No request classified yet</span>
+        </div>
+      </div>
+
+      <!-- meters -->
+      <div class="meters">
+        <div class="meter">
+          <div class="meter-top"><span>Routing confidence</span><b id="conf-val">—</b></div>
+          <div class="bar"><i id="conf-bar"></i></div>
+        </div>
+        <div class="meter">
+          <div class="meter-top"><span>KB coverage</span><b id="cov-val">—</b></div>
+          <div class="bar"><i id="cov-bar" class="cov"></i></div>
+        </div>
+      </div>
+
+      <!-- pipeline -->
+      <div class="pipeline" id="pipeline">
+        <div class="step" data-step="classify">
+          <span class="step-ico">①</span>
+          <div class="step-body"><b>Classify</b><small>Route intent</small></div>
+          <span class="step-state"></span>
+        </div>
+        <div class="step" data-step="retrieve">
+          <span class="step-ico">②</span>
+          <div class="step-body"><b>Retrieve</b><small>Domain knowledge base</small></div>
+          <span class="step-state"></span>
+        </div>
+        <div class="step" data-step="gate">
+          <span class="step-ico">③</span>
+          <div class="step-body"><b>Gate</b><small>Escalation check</small></div>
+          <span class="step-state"></span>
+        </div>
+        <div class="step" data-step="respond">
+          <span class="step-ico">④</span>
+          <div class="step-body"><b>Respond</b><small>Specialist answer</small></div>
+          <span class="step-state"></span>
+        </div>
+      </div>
+
+      <!-- escalation alert -->
+      <div class="escalation" id="escalation" hidden>
+        <div class="esc-head">🚨 Escalated to a human</div>
+        <p id="esc-reason"></p>
+      </div>
+    </aside>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
