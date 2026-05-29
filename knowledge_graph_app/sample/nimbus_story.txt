@@ -1,0 +1,7 @@
+Nimbus is a collaborative analytics company founded in 2019 by Elena Marsh and Raj Patel in Austin, Texas. Elena Marsh previously worked at Snowflake as a principal engineer, where she met Raj Patel, who led the data platform team. Together they raised a seed round from Foundry Capital, led by partner Dana Cole.
+
+Nimbus builds a product called Nimbus Cloud, a workspace that lets teams centralize data and build dashboards. Nimbus Cloud integrates with Snowflake, BigQuery, and Postgres. In 2021, Nimbus acquired a small startup called Vizly, a data-visualization company based in Seattle, to strengthen its charting engine. Vizly was founded by Marco Reyes, who joined Nimbus as the Head of Design after the acquisition.
+
+Dana Cole also sits on the board of Foundry Capital and previously invested in Snowflake. Raj Patel serves as the Chief Technology Officer of Nimbus, while Elena Marsh is the Chief Executive Officer. The company is headquartered in Austin and has a research office in Seattle, which was established after the Vizly acquisition.
+
+In 2023, Nimbus partnered with Microsoft to offer Nimbus Cloud on Azure. The partnership was announced at the Microsoft Build conference. Marco Reyes presented the new design system, called Aurora, at the same event. Aurora is now used across all Nimbus products.

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Atlas · Knowledge Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css?v=3" />
+</head>
+<body>
+<div class="app">
+
+  <!-- left rail -->
+  <aside class="rail">
+    <button class="rail-btn" id="toggle-panel" title="Toggle panel" aria-label="Toggle panel">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+    </button>
+    <button class="rail-btn rail-new" id="rail-new" title="New" aria-label="New">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="rail-btn" title="History" aria-label="History">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <button class="rail-btn" title="Saved" aria-label="Saved">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16v16l-8-5-8 5z"/></svg>
+    </button>
+  </aside>
+
+  <!-- main stage -->
+  <div class="stage">
+    <header class="topbar">
+      <div class="brand-min">Atlas</div>
+      <div class="top-right">
+        <div class="stat-pill" id="stat-pill"><span id="stat-ent">0</span> entities · <span id="stat-rel">0</span> links</div>
+        <div class="avatar"></div>
+      </div>
+    </header>
+
+    <!-- HERO / empty state -->
+    <section class="hero" id="hero">
+      <h1 class="hero-title">What should I map?</h1>
+      <p class="hero-sub">Paste any text and watch a knowledge graph build itself — entities and the
+        relationships between them. Then ask how any two things connect.</p>
+      <div class="hero-slot" id="hero-slot"></div>
+      <div class="hero-hints" id="hero-hints">
+        <button class="hint" data-sample="1">Try the sample story</button>
+        <span class="hint-note">or paste your own text above</span>
+      </div>
+    </section>
+
+    <!-- WORKSPACE -->
+    <section class="workspace" id="workspace" hidden>
+      <canvas id="graph"></canvas>
+
+      <!-- floating HUD: stats + legend + filter -->
+      <div class="hud panel" id="panel">
+        <div class="panel-head">
+          <span class="panel-title">Knowledge Graph</span>
+          <div class="panel-counts"><b id="ph-ent">0</b> entities · <b id="ph-rel">0</b> relations</div>
+        </div>
+        <div class="legend" id="legend"></div>
+        <div class="panel-actions">
+          <button class="ghost-btn" id="btn-fit">Fit view</button>
+          <button class="ghost-btn" id="btn-clear">Clear graph</button>
+        </div>
+      </div>
+
+      <!-- answer card -->
+      <div class="answer-card" id="answer" hidden>
+        <div class="answer-head">
+          <span class="intent-badge" id="intent-badge">connection</span>
+          <span class="answer-note" id="answer-note"></span>
+          <button class="answer-close" id="answer-close" aria-label="Close">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="answer-body" id="answer-body"></div>
+      </div>
+
+      <!-- ingest progress -->
+      <div class="ingest-toast" id="ingest-toast" hidden>
+        <div class="spinner"></div>
+        <div class="toast-text"><b id="toast-title">Mapping…</b><span id="toast-sub"></span></div>
+        <div class="toast-bar"><i id="toast-bar-fill"></i></div>
+      </div>
+
+      <!-- docked composer slot -->
+      <div class="dock" id="dock-slot"></div>
+    </section>
+  </div>
+</div>
+
+<!-- composer template (moved between hero & dock) -->
+<template id="composer-tpl">
+  <form class="composer" id="composer">
+    <textarea id="input" rows="1" placeholder="Paste text to map, or ask how two things connect…"></textarea>
+    <div class="composer-bar">
+      <div class="left-tools">
+        <button class="icon-btn" id="attach" type="button" title="Attach file" aria-label="Attach file">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7l9-9a3.3 3.3 0 0 1 4.7 4.7l-9 9a1.6 1.6 0 0 1-2.3-2.3l8.3-8.3"/></svg>
+        </button>
+        <div class="mode" id="mode">
+          <button class="mode-pill active" data-mode="build" type="button">
+            <svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.4"/><circle cx="18" cy="7" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M7.8 8.4l8.4 0M7 9l4 7M17 9l-4 7"/></svg>
+            Build graph
+          </button>
+          <button class="mode-pill" data-mode="ask" type="button">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            Ask
+          </button>
+        </div>
+      </div>
+      <button class="send" id="send" type="submit" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
+    <input type="file" id="file" hidden accept=".txt,.md,.pdf" />
+  </form>
+</template>
+
+<script src="/app.js?v=3"></script>
+</body>
+</html>
