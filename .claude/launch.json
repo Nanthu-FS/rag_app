@@ -1,0 +1,41 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "triage-bot",
+      "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "runtimeArgs": ["-c", "import sys,os; d=r'C:\\Users\\admin\\rag_app\\support_triage_bot'; os.chdir(d); sys.path.insert(0,d); import uvicorn; uvicorn.run('backend.server:app', host='127.0.0.1', port=8800)"],
+      "port": 8800
+    },
+    {
+      "name": "diagrams",
+      "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "runtimeArgs": ["-m", "http.server", "8901", "--directory", "C:\\Users\\admin\\rag_app\\diagrams"],
+      "port": 8901
+    },
+    {
+      "name": "resume",
+      "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "runtimeArgs": ["-m", "http.server", "8902", "--directory", "C:\\Users\\admin\\rag_app\\resume_build"],
+      "port": 8902
+    },
+    {
+      "name": "geosnap",
+      "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "runtimeArgs": ["-c", "import sys,os; d=r'C:\\Users\\admin\\rag_app\\geosnap'; os.chdir(d); sys.path.insert(0,d); import uvicorn; uvicorn.run('backend.server:app', host='127.0.0.1', port=8820)"],
+      "port": 8820
+    },
+    {
+      "name": "knowledge-graph",
+      "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "runtimeArgs": ["-c", "import sys,os; d=r'C:\\Users\\admin\\rag_app\\knowledge_graph_app'; os.chdir(d); sys.path.insert(0,d); import uvicorn; uvicorn.run('backend.server:app', host='127.0.0.1', port=8810)"],
+      "port": 8810
+    },
+    {
+      "name": "flight-tracker",
+      "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "runtimeArgs": ["C:\\Users\\admin\\rag_app\\flight_tracker\\server.py"],
+      "port": 8830
+    }
+  ]
+}
