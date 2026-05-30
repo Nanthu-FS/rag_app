@@ -11,3 +11,6 @@ chroma_db/
 # Env / secrets
 .env
 *.local
+
+# Local app config holding live keys (Supabase anon key etc.) — use config.example.js
+fitness_tracker/web/config.js

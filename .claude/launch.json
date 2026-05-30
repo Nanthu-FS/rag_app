@@ -36,6 +36,12 @@
       "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
       "runtimeArgs": ["C:\\Users\\admin\\rag_app\\flight_tracker\\server.py"],
       "port": 8830
+    },
+    {
+      "name": "fitness-tracker",
+      "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "runtimeArgs": ["C:\\Users\\admin\\rag_app\\fitness_tracker\\server.py"],
+      "port": 8840
     }
   ]
 }

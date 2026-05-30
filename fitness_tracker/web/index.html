@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Vital · AI Body Tracker</title>
+<style>
+  :root{
+    --ink:#1c2530; --muted:rgba(40,55,72,.55); --hair:rgba(120,140,160,.22);
+    --glass:rgba(255,255,255,.5); --glass-strong:rgba(255,255,255,.72);
+    --dark:rgba(26,36,49,.62); --accent:#5b8fb9; --accent2:#8fb6d6;
+    --ring:#6ea2cc; --good:#5fb98c; --warn:#e0a458;
+    --shadow:0 20px 50px rgba(40,60,85,.18);
+    --r:34px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;
+    color:var(--ink);
+    display:grid;place-items:center;
+    background:
+      radial-gradient(120% 80% at 30% 0%, #e9eff5 0%, #cfdae6 38%, #b6c6d6 70%, #9fb4c8 100%);
+    min-height:100vh;
+  }
+  /* phone frame */
+  .phone{
+    position:relative; width:min(440px,100vw); height:min(940px,100vh);
+    overflow:hidden; background:
+      radial-gradient(130% 60% at 70% 8%, #dbe6f0 0%, #b9c9da 45%, #93abc2 100%);
+  }
+  /* soft body silhouette like the mockups */
+  .phone::before{
+    content:""; position:absolute; inset:0; z-index:0; opacity:.5;
+    background:
+      radial-gradient(40% 30% at 62% 22%, rgba(40,60,85,.42), transparent 70%),
+      radial-gradient(55% 45% at 50% 65%, rgba(70,95,125,.32), transparent 72%);
+    filter:blur(6px);
+  }
+  .screen{position:absolute; inset:0; z-index:1; display:flex; flex-direction:column;
+    padding:54px 20px 24px; overflow-y:auto; gap:16px;}
+  .screen::-webkit-scrollbar{display:none}
+  .hidden{display:none!important}
+
+  .thin{font-weight:200; letter-spacing:-.02em}
+  .label{font-size:12px; letter-spacing:.06em; color:var(--muted); font-weight:500}
+  .h-title{font-size:15px; font-weight:500; letter-spacing:.02em; color:rgba(28,37,48,.8)}
+
+  /* ---------- glass cards ---------- */
+  .card{
+    background:var(--glass); backdrop-filter:blur(26px) saturate(140%);
+    -webkit-backdrop-filter:blur(26px) saturate(140%);
+    border:1px solid rgba(255,255,255,.55); border-radius:var(--r);
+    box-shadow:var(--shadow); padding:20px;
+  }
+  .card.dark{background:var(--dark); border-color:rgba(255,255,255,.12); color:#eef4fa}
+  .card.dark .label{color:rgba(230,240,250,.6)}
+
+  /* ---------- onboarding ---------- */
+  #onboard{justify-content:flex-start}
+  .brand{display:flex; align-items:center; gap:8px; font-weight:300; font-size:22px;
+    letter-spacing:.04em}
+  .brand b{font-weight:600}
+  .lede{font-size:13px; color:var(--muted); margin-top:-6px}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .inp{display:flex; flex-direction:column; gap:6px; min-width:0}
+  .inp input, .inp select{
+    border:0; outline:0; background:rgba(255,255,255,.55); border-radius:18px;
+    padding:14px 16px; font-size:18px; font-weight:300; color:var(--ink);
+    border:1px solid rgba(255,255,255,.5); width:100%; min-width:0;
+  }
+  .seg{display:flex; gap:6px; background:rgba(255,255,255,.4); border-radius:18px; padding:5px}
+  .seg button{flex:1; border:0; background:transparent; padding:11px 4px; border-radius:14px;
+    font-size:13px; font-weight:500; color:var(--muted); cursor:pointer; transition:.15s}
+  .seg button.on{background:#fff; color:var(--ink); box-shadow:0 4px 12px rgba(0,0,0,.08)}
+
+  .btn{
+    border:0; border-radius:40px; padding:18px; font-size:16px; font-weight:600;
+    cursor:pointer; transition:.15s; width:100%; color:#fff;
+    background:linear-gradient(135deg,#27384a,#42627e);
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:disabled{opacity:.6; transform:none; cursor:default}
+  .btn.ghost{background:rgba(255,255,255,.55); color:var(--ink)}
+
+  /* ---------- dashboard hero gauge ---------- */
+  .topbar{display:flex; justify-content:space-between; align-items:flex-start}
+  .topbar .who{font-size:20px; font-weight:300}
+  .topbar .date{font-size:12px; color:var(--muted)}
+  .chips{display:flex; flex-direction:column; align-items:flex-end; gap:2px; text-align:right}
+  .chip{font-size:13px; font-weight:300; color:rgba(28,37,48,.75)}
+  .chip span{font-size:10px; color:var(--muted)}
+
+  .hero{position:relative; display:grid; place-items:center; padding:8px 0 4px}
+  .hero .bignum{position:absolute; top:0; left:4px; text-align:left}
+  .hero .bignum .n{font-size:74px; line-height:.9; font-weight:200; letter-spacing:-.04em}
+  .hero .bignum .u{font-size:22px; font-weight:300; color:var(--muted); margin-left:4px}
+  .hero .bignum .k{font-size:12px; letter-spacing:.08em; color:var(--muted); margin-top:4px}
+  .gauge{margin-top:64px}
+  .gauge-wrap{position:relative; width:230px; height:230px}
+  .gauge-center{position:absolute; inset:0; display:grid; place-items:center; text-align:center}
+  .gauge-center .gc-n{font-size:34px; font-weight:200; letter-spacing:-.03em}
+  .gauge-center .gc-l{font-size:11px; letter-spacing:.08em; color:var(--muted)}
+  .gauge-ends{display:flex; justify-content:space-between; width:230px; margin:-14px auto 0;
+    font-size:12px; color:var(--muted)}
+
+  /* macros */
+  .macros{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px}
+  .macro .label{display:flex; justify-content:space-between; margin-bottom:6px}
+  .bar{height:6px; border-radius:6px; background:rgba(255,255,255,.5); overflow:hidden}
+  .bar i{display:block; height:100%; border-radius:6px;
+    background:linear-gradient(90deg,var(--accent2),var(--accent))}
+
+  /* water */
+  .row{display:flex; gap:14px}
+  .row > .card{flex:1}
+  .water-glasses{display:flex; gap:6px; flex-wrap:wrap; margin:12px 0}
+  .glass{width:22px; height:30px; border-radius:6px 6px 8px 8px;
+    border:1.5px solid var(--accent); background:transparent; cursor:pointer; transition:.15s}
+  .glass.full{background:linear-gradient(180deg,var(--accent2),var(--accent))}
+  .counter{display:flex; align-items:center; gap:14px; margin-top:8px}
+  .counter button{width:38px; height:38px; border-radius:50%; border:0; font-size:22px;
+    background:rgba(255,255,255,.6); cursor:pointer; color:var(--ink)}
+  .card.dark .counter button{background:rgba(255,255,255,.18); color:#fff}
+
+  /* lists */
+  .item{display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:11px 0; border-top:1px solid var(--hair); font-size:14px}
+  .item:first-of-type{border-top:0}
+  .item .x{cursor:pointer; color:var(--muted); font-size:18px; padding:0 4px}
+  .item small{color:var(--muted); font-weight:400}
+  .add-link{font-size:13px; font-weight:600; color:var(--accent); cursor:pointer}
+
+  .meal-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px}
+  .meal-head .kcal{font-size:13px; color:var(--muted)}
+  .meal-kcal-big{font-size:30px; font-weight:200}
+
+  .coach-card .summary{font-size:14px; line-height:1.55; color:rgba(28,37,48,.82); margin-top:8px}
+  .pill{display:inline-block; font-size:11px; padding:4px 10px; border-radius:20px;
+    background:rgba(255,255,255,.5); color:var(--muted); margin-top:10px; margin-right:6px}
+
+  /* modal */
+  .modal{position:absolute; inset:0; z-index:10; background:rgba(30,42,56,.32);
+    backdrop-filter:blur(4px); display:flex; align-items:flex-end}
+  .sheet{width:100%; max-height:88%; overflow-y:auto; background:rgba(247,250,253,.96);
+    backdrop-filter:blur(30px); border-radius:30px 30px 0 0; padding:22px 20px 28px;
+    box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+  .sheet h3{font-weight:500; font-size:18px; margin-bottom:4px}
+  .sheet .close{float:right; font-size:22px; color:var(--muted); cursor:pointer; line-height:1}
+  .search-row{display:flex; gap:8px; margin:14px 0}
+  .search-row input{flex:1; border:0; background:#fff; border-radius:16px; padding:13px 15px;
+    font-size:15px; border:1px solid var(--hair)}
+  .food{display:flex; justify-content:space-between; align-items:center; gap:8px;
+    padding:12px; border-radius:16px; background:#fff; margin-bottom:8px; cursor:pointer;
+    border:1px solid var(--hair)}
+  .food:hover{border-color:var(--accent)}
+  .food .fn{font-size:14px; font-weight:500}
+  .food .fm{font-size:12px; color:var(--muted)}
+  .food .fk{font-size:15px; font-weight:300; white-space:nowrap}
+  .muted-note{font-size:12px; color:var(--muted); text-align:center; padding:14px}
+  .slot-tabs{display:flex; gap:6px; margin:10px 0}
+  .slot-tabs button{flex:1; padding:9px; border:0; border-radius:14px; font-size:12px;
+    background:rgba(0,0,0,.05); color:var(--muted); cursor:pointer; font-weight:500}
+  .slot-tabs button.on{background:var(--ink); color:#fff}
+  .backend-tag{position:absolute; top:14px; left:50%; transform:translateX(-50%); z-index:5;
+    font-size:10px; letter-spacing:.1em; color:var(--muted); text-transform:uppercase}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="backend-tag" id="backendTag"></div>
+
+  <!-- ================= ONBOARDING ================= -->
+  <section class="screen hidden" id="onboard">
+    <div class="brand">❤ <b>Vital</b></div>
+    <div class="lede">Tell us about your body. AI sets your ideal targets.</div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div class="inp"><span class="label">NAME</span><input id="f-name" placeholder="Surja" /></div>
+      <div>
+        <span class="label">SEX</span>
+        <div class="seg" id="f-sex" style="margin-top:6px">
+          <button data-v="male" class="on">Male</button>
+          <button data-v="female">Female</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="inp"><span class="label">AGE</span><input id="f-age" type="number" value="28" /></div>
+        <div class="inp"><span class="label">HEIGHT (cm)</span><input id="f-height" type="number" value="175" /></div>
+      </div>
+      <div class="inp"><span class="label">WEIGHT (kg)</span><input id="f-weight" type="number" value="78" /></div>
+      <div>
+        <span class="label">ACTIVITY</span>
+        <div class="seg" id="f-activity" style="margin-top:6px;flex-wrap:wrap">
+          <button data-v="sedentary">Low</button>
+          <button data-v="light">Light</button>
+          <button data-v="moderate" class="on">Moderate</button>
+          <button data-v="active">Active</button>
+          <button data-v="athlete">Athlete</button>
+        </div>
+      </div>
+      <div>
+        <span class="label">GOAL</span>
+        <div class="seg" id="f-goal" style="margin-top:6px">
+          <button data-v="lose">Lose fat</button>
+          <button data-v="maintain" class="on">Maintain</button>
+          <button data-v="gain">Build muscle</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" id="analyzeBtn">Analyze with AI</button>
+    <div class="muted-note" id="onboardNote"></div>
+  </section>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section class="screen hidden" id="dash">
+    <div class="topbar">
+      <div>
+        <div class="who" id="d-who">—</div>
+        <div class="date" id="d-date"></div>
+      </div>
+      <div class="chips">
+        <div class="chip" id="d-bmi">— <span>BMI</span></div>
+        <div class="chip" id="d-cat"><span></span></div>
+        <div class="add-link" id="editProfile" style="margin-top:6px">Edit</div>
+      </div>
+    </div>
+
+    <!-- hero calorie gauge -->
+    <div class="card hero">
+      <div class="bignum">
+        <span class="n thin" id="d-eaten">0</span><span class="u">kcal</span>
+        <div class="k" id="d-target">of 0 target</div>
+      </div>
+      <div class="gauge">
+        <div class="gauge-wrap">
+          <svg width="230" height="230" viewBox="0 0 230 230">
+            <circle cx="115" cy="115" r="100" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="14"/>
+            <circle id="ring" cx="115" cy="115" r="100" fill="none" stroke="url(#g)"
+              stroke-width="14" stroke-linecap="round" transform="rotate(-90 115 115)"
+              stroke-dasharray="628" stroke-dashoffset="628"/>
+            <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#9cc1e0"/><stop offset="1" stop-color="#4f82ad"/>
+            </linearGradient></defs>
+          </svg>
+          <div class="gauge-center">
+            <div>
+              <div class="gc-n thin" id="d-remaining">0</div>
+              <div class="gc-l">kcal left</div>
+            </div>
+          </div>
+        </div>
+        <div class="gauge-ends"><span>Intake</span><span>Goal</span></div>
+      </div>
+    </div>
+
+    <!-- AI coach -->
+    <div class="card coach-card">
+      <div class="h-title">AI Coach</div>
+      <div class="summary" id="d-summary">—</div>
+      <div id="d-tips"></div>
+    </div>
+
+    <!-- macros -->
+    <div class="card">
+      <div class="h-title" style="margin-bottom:14px">Macros today</div>
+      <div class="macros" id="d-macros"></div>
+    </div>
+
+    <!-- water + workouts -->
+    <div class="row">
+      <div class="card dark" style="flex:1">
+        <div class="label">WATER</div>
+        <div><span class="meal-kcal-big" id="w-count">0</span>
+          <span class="label">/ <span id="w-target">8</span> glasses</span></div>
+        <div class="water-glasses" id="w-glasses"></div>
+        <div class="counter">
+          <button id="w-minus">−</button><button id="w-plus">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="meal-head">
+        <div class="h-title">Workouts</div>
+        <div class="add-link" id="addWorkout">+ Add</div>
+      </div>
+      <div id="d-workouts"></div>
+      <div class="item" style="border-top:1px solid var(--hair)">
+        <span class="label">Burned today</span>
+        <strong class="thin" id="d-burned" style="font-size:20px">0 kcal</strong>
+      </div>
+    </div>
+
+    <!-- meals -->
+    <div id="d-meals"></div>
+
+    <div style="height:10px"></div>
+  </section>
+
+  <!-- ================= FOOD MODAL ================= -->
+  <div class="modal hidden" id="foodModal">
+    <div class="sheet">
+      <span class="close" id="foodClose">×</span>
+      <h3 id="foodTitle">Add food</h3>
+      <div class="label">Search OpenFoodFacts or add a custom item</div>
+      <div class="search-row">
+        <input id="foodQuery" placeholder="e.g. greek yogurt" />
+        <button class="btn" style="width:auto;padding:13px 18px" id="foodSearchBtn">Search</button>
+      </div>
+      <div id="foodResults"></div>
+    </div>
+  </div>
+
+  <!-- ================= ADD-FOOD QTY MODAL ================= -->
+  <div class="modal hidden" id="qtyModal">
+    <div class="sheet">
+      <span class="close" id="qtyClose">×</span>
+      <h3 id="qtyName">Food</h3>
+      <div class="label" id="qtyPer"></div>
+      <div class="inp" style="margin:14px 0">
+        <span class="label">SERVING (grams)</span>
+        <input id="qtyGrams" type="number" value="100" />
+      </div>
+      <div class="grid2" style="margin-bottom:14px">
+        <div class="inp"><span class="label">CALORIES</span><input id="qtyKcal" type="number" /></div>
+        <div class="inp"><span class="label">PROTEIN (g)</span><input id="qtyP" type="number" /></div>
+        <div class="inp"><span class="label">CARBS (g)</span><input id="qtyC" type="number" /></div>
+        <div class="inp"><span class="label">FAT (g)</span><input id="qtyF" type="number" /></div>
+      </div>
+      <button class="btn" id="qtyAdd">Add to <span id="qtySlot">meal</span></button>
+    </div>
+  </div>
+
+  <!-- ================= WORKOUT MODAL ================= -->
+  <div class="modal hidden" id="workoutModal">
+    <div class="sheet">
+      <span class="close" id="workoutClose">×</span>
+      <h3>Log a workout</h3>
+      <div id="wk-suggest"></div>
+      <div class="inp" style="margin:12px 0 10px"><span class="label">NAME</span><input id="wk-name" placeholder="Run, gym, yoga…" /></div>
+      <div class="grid2">
+        <div class="inp"><span class="label">MINUTES</span><input id="wk-min" type="number" value="30" /></div>
+        <div class="inp"><span class="label">KCAL BURNED</span><input id="wk-kcal" type="number" value="250" /></div>
+      </div>
+      <button class="btn" id="wk-save" style="margin-top:14px">Add workout</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
