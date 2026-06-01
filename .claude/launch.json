@@ -42,6 +42,12 @@
       "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
       "runtimeArgs": ["C:\\Users\\admin\\rag_app\\fitness_tracker\\server.py"],
       "port": 8840
+    },
+    {
+      "name": "personal-intelligence",
+      "runtimeExecutable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "runtimeArgs": ["-c", "import sys,os; d=r'C:\\Users\\admin\\rag_app\\personal_intelligence\\backend'; os.chdir(d); sys.path.insert(0,d); import uvicorn; uvicorn.run('server:app', host='127.0.0.1', port=8850)"],
+      "port": 8850
     }
   ]
 }

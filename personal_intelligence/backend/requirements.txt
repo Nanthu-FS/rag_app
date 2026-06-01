@@ -1,0 +1,14 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+httpx==0.28.1
+ddgs==9.0.0
+sympy==1.13.3
+faster-whisper==1.1.0
+python-multipart==0.0.20
+
+# CUDA 12 runtime libs faster-whisper/CTranslate2 needs for GPU inference on
+# Windows (cuBLAS depends on the CUDA runtime; cuDNN 9 for CUDA 12). The STT
+# loader puts these on PATH automatically; it falls back to CPU if absent.
+nvidia-cublas-cu12
+nvidia-cudnn-cu12>=9,<10
+nvidia-cuda-runtime-cu12
