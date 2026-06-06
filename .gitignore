@@ -14,3 +14,9 @@ chroma_db/
 
 # Local app config holding live keys (Supabase anon key etc.) — use config.example.js
 fitness_tracker/web/config.js
+
+# Apps moved to their own standalone repos (kept on disk, no longer part of this monorepo)
+/fitness_tracker/
+/flight_tracker/
+/geosnap/
+/personal_intelligence/
