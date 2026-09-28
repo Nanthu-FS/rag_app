@@ -11,3 +11,13 @@ chroma_db/
 # Env / secrets
 .env
 *.local
+
+# .NET
+bin/
+obj/
+*.user
+TestResults/
+
+# ScopeScan runtime data (keep the example)
+data/scope.json
+data/scans/

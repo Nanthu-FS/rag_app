@@ -1,0 +1,16 @@
+{
+  "entries": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "pattern": "app.example.com",
+      "notes": "Placeholder - replace with an asset you are authorized to test",
+      "createdAt": "2026-01-01T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "pattern": "*.staging.example.com",
+      "notes": "Wildcard: matches subdomains only, not staging.example.com itself",
+      "createdAt": "2026-01-01T00:00:00+00:00"
+    }
+  ]
+}
