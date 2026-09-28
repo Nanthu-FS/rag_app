@@ -57,4 +57,7 @@ public interface IScopeGate
     Task<ScopeDecision> EvaluateAsync(Uri uri, CancellationToken ct = default);
 }
 
-public sealed class OutOfScopeException(string message) : Exception(message);
+/// <summary>A request was refused before being sent (scope, SSRF, method policy).</summary>
+public class RequestBlockedException(string message) : Exception(message);
+
+public sealed class OutOfScopeException(string message) : RequestBlockedException(message);

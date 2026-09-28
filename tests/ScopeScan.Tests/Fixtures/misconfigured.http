@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Server: Apache/2.4.29 (Ubuntu)
+X-Powered-By: PHP/7.2.1
+Set-Cookie: PHPSESSID=9f8e7d6c5b4a3f2e1d0c9b8a; path=/
+Set-Cookie: theme=dark; Path=/; Secure; HttpOnly; SameSite=Lax
+Referrer-Policy: unsafe-url
+
+<!doctype html><html><head><title>Legacy App</title></head><body><h1>Welcome</h1></body></html>

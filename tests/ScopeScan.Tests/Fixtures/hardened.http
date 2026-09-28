@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Server: nginx
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-abc123'; frame-ancestors 'none'
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Set-Cookie: __Host-session=abcdef0123456789; Path=/; Secure; HttpOnly; SameSite=Strict
+
+<!doctype html><html><head><title>Hardened</title></head><body>ok</body></html>
