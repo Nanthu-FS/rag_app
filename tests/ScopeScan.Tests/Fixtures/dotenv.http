@@ -1,0 +1,8 @@
+HTTP/1.1 200 OK
+Content-Type: text/plain
+
+DB_HOST=db.internal
+DB_PASSWORD=Sup3rS3cret!
+API_KEY=sk_live_abcdefghijklmnop
+# comment
+DEBUG=true

@@ -24,6 +24,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IScanCheck, CookieFlagsCheck>();
         services.AddSingleton<IScanCheck, CorsCheck>();
         services.AddSingleton<IScanCheck>(sp => new TlsCheck(sp.GetRequiredService<TimeProvider>()));
+        services.AddSingleton(_ => JsVulnerabilityDatabase.LoadEmbedded());
+        services.AddSingleton<IScanCheck, ExposedFilesCheck>();
+        services.AddSingleton<IScanCheck, JsLibraryCheck>();
+        services.AddSingleton<IScanCheck, ReflectedParameterCheck>();
+        services.AddSingleton<IScanCheck, OpenRedirectCheck>();
+        services.AddSingleton<IScanCheck, FingerprintCheck>();
         return services;
     }
 }

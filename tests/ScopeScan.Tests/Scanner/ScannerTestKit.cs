@@ -20,6 +20,8 @@ public sealed class FixtureHandler : HttpMessageHandler
     public TimeSpan Delay { get; set; }
 
     public FixtureHandler On(string url, Func<HttpRequestMessage, HttpResponseMessage> respond) { _routes[url] = respond; return this; }
+    private readonly List<(Func<string, bool> Match, Func<HttpRequestMessage, HttpResponseMessage> Respond)> _predicates = [];
+    public FixtureHandler On(Func<string, bool> match, Func<HttpRequestMessage, HttpResponseMessage> respond) { _predicates.Add((match, respond)); return this; }
     public FixtureHandler On(string url, string fixtureName) => On(url, _ => Fixtures.Load(fixtureName));
     public FixtureHandler OnRaw(string url, string rawHttp) => On(url, _ => Fixtures.Parse(rawHttp));
 
@@ -32,6 +34,8 @@ public sealed class FixtureHandler : HttpMessageHandler
         var url = request.RequestUri!.ToString();
         if (_routes.TryGetValue(url, out var respond) || _routes.TryGetValue(request.RequestUri.PathAndQuery, out respond))
             return respond(request);
+        foreach (var (match, r) in _predicates)
+            if (match(url)) return r(request);
         return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("<html><body>Not found</body></html>", Encoding.UTF8, "text/html") };
     }
 }

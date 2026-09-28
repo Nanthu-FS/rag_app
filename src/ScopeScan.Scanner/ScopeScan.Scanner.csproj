@@ -16,4 +16,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Data\js-vulnerabilities.json" LogicalName="ScopeScan.Scanner.js-vulnerabilities.json" />
+  </ItemGroup>
+
 </Project>

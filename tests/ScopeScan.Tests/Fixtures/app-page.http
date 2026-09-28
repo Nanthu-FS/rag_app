@@ -1,0 +1,27 @@
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Server: nginx/1.18.0
+X-Powered-By: Express
+CF-RAY: 7d1a2b3c4d5e6f70-LHR
+Set-Cookie: connect.sid=s%3Aabc; Path=/; HttpOnly
+
+<!doctype html>
+<html>
+<head>
+  <title>Shop</title>
+  <meta name="generator" content="WordPress 5.8.1">
+  <link rel="stylesheet" href="/wp-content/themes/shop/style.css">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+  <script src="/assets/vendor.js"></script>
+  <script src="/assets/app.js?v=2"></script>
+  <script>/*! Bootstrap v3.3.7 (http://getbootstrap.com) */ var x = 1;</script>
+</head>
+<body>
+  <a href="/search?q=shoes&page=1">Search</a>
+  <a href="/login?next=/account">Login</a>
+  <a href="/private/report?id=7">Report</a>
+  <a href="https://other.example.org/?x=1">External</a>
+  <a href="javascript:void(0)">noop</a>
+</body>
+</html>

@@ -1,0 +1,95 @@
+{
+  "updated": "2026-09-01",
+  "note": "Curated subset of well-known client-side library advisories. Ranges use atOrAbove (inclusive) and below (exclusive).",
+  "libraries": [
+    {
+      "name": "jquery",
+      "displayName": "jQuery",
+      "urlPatterns": ["jquery[.-](\\d+\\.\\d+\\.\\d+)(?:\\.slim)?(?:\\.min)?\\.js", "/jquery/(\\d+\\.\\d+\\.\\d+)/", "jquery@(\\d+\\.\\d+\\.\\d+)"],
+      "contentPatterns": ["jQuery v(\\d+\\.\\d+\\.\\d+)", "jQuery JavaScript Library v(\\d+\\.\\d+\\.\\d+)"],
+      "vulnerabilities": [
+        { "below": "1.6.3", "severity": "Medium", "identifiers": ["CVE-2011-4969"], "summary": "XSS via location.hash in selector" },
+        { "atOrAbove": "1.2.0", "below": "1.9.0", "severity": "Medium", "identifiers": ["CVE-2012-6708"], "summary": "Selector interpreted as HTML (XSS)" },
+        { "below": "3.0.0", "severity": "Medium", "identifiers": ["CVE-2015-9251"], "summary": "Cross-domain ajax responses executed as script" },
+        { "below": "3.4.0", "severity": "Medium", "identifiers": ["CVE-2019-11358"], "summary": "Prototype pollution in jQuery.extend" },
+        { "atOrAbove": "1.0.3", "below": "3.5.0", "severity": "Medium", "identifiers": ["CVE-2020-11022", "CVE-2020-11023"], "summary": "XSS when passing untrusted HTML to DOM manipulation methods" }
+      ]
+    },
+    {
+      "name": "jquery-ui",
+      "displayName": "jQuery UI",
+      "urlPatterns": ["jquery-ui[.-](\\d+\\.\\d+\\.\\d+)", "/jqueryui/(\\d+\\.\\d+\\.\\d+)/", "jquery-ui@(\\d+\\.\\d+\\.\\d+)", "/ui/(\\d+\\.\\d+\\.\\d+)/jquery-ui"],
+      "contentPatterns": ["jQuery UI - v(\\d+\\.\\d+\\.\\d+)"],
+      "vulnerabilities": [
+        { "below": "1.12.0", "severity": "Medium", "identifiers": ["CVE-2016-7103"], "summary": "XSS in dialog closeText" },
+        { "below": "1.13.0", "severity": "Medium", "identifiers": ["CVE-2021-41182", "CVE-2021-41183", "CVE-2021-41184"], "summary": "XSS via untrusted options (altField, datepicker text, position 'of')" },
+        { "below": "1.13.2", "severity": "Medium", "identifiers": ["CVE-2022-31160"], "summary": "XSS in checkboxradio label refresh" }
+      ]
+    },
+    {
+      "name": "bootstrap",
+      "displayName": "Bootstrap",
+      "urlPatterns": ["bootstrap[.-](\\d+\\.\\d+\\.\\d+)(?:\\.bundle)?(?:\\.min)?\\.js", "/bootstrap/(\\d+\\.\\d+\\.\\d+)/", "bootstrap@(\\d+\\.\\d+\\.\\d+)"],
+      "contentPatterns": ["Bootstrap v(\\d+\\.\\d+\\.\\d+)"],
+      "vulnerabilities": [
+        { "below": "3.4.0", "severity": "Medium", "identifiers": ["CVE-2018-14040", "CVE-2018-14041", "CVE-2018-14042"], "summary": "XSS in collapse/scrollspy/tooltip data attributes" },
+        { "atOrAbove": "4.0.0", "below": "4.1.2", "severity": "Medium", "identifiers": ["CVE-2018-14040", "CVE-2018-14041", "CVE-2018-14042"], "summary": "XSS in collapse/scrollspy/tooltip data attributes" },
+        { "below": "3.4.1", "severity": "Medium", "identifiers": ["CVE-2019-8331"], "summary": "XSS in tooltip/popover data-template" },
+        { "atOrAbove": "4.0.0", "below": "4.3.1", "severity": "Medium", "identifiers": ["CVE-2019-8331"], "summary": "XSS in tooltip/popover data-template" }
+      ]
+    },
+    {
+      "name": "angularjs",
+      "displayName": "AngularJS (1.x)",
+      "urlPatterns": ["angular(?:js)?[.-](1\\.\\d+\\.\\d+)(?:\\.min)?\\.js", "/angular(?:js|\\.js)/(1\\.\\d+\\.\\d+)/", "angular@(1\\.\\d+\\.\\d+)"],
+      "contentPatterns": ["AngularJS v(1\\.\\d+\\.\\d+)"],
+      "vulnerabilities": [
+        { "below": "1.8.0", "severity": "Medium", "identifiers": ["CVE-2020-7676"], "summary": "XSS via regex-based input sanitisation" },
+        { "below": "2.0.0", "severity": "Low", "identifiers": ["CVE-2022-25869", "CVE-2023-26116"], "summary": "AngularJS is end-of-life; later advisories remain unpatched" }
+      ]
+    },
+    {
+      "name": "lodash",
+      "displayName": "Lodash",
+      "urlPatterns": ["lodash[.-](\\d+\\.\\d+\\.\\d+)(?:\\.min)?\\.js", "/lodash(?:\\.js)?/(\\d+\\.\\d+\\.\\d+)/", "lodash@(\\d+\\.\\d+\\.\\d+)"],
+      "contentPatterns": [],
+      "vulnerabilities": [
+        { "below": "4.17.12", "severity": "High", "identifiers": ["CVE-2019-10744"], "summary": "Prototype pollution in defaultsDeep" },
+        { "below": "4.17.19", "severity": "High", "identifiers": ["CVE-2020-8203"], "summary": "Prototype pollution in zipObjectDeep" },
+        { "below": "4.17.21", "severity": "High", "identifiers": ["CVE-2021-23337", "CVE-2020-28500"], "summary": "Command injection in template; ReDoS in trim functions" }
+      ]
+    },
+    {
+      "name": "moment",
+      "displayName": "Moment.js",
+      "urlPatterns": ["moment[.-](\\d+\\.\\d+\\.\\d+)(?:\\.min)?\\.js", "/moment(?:\\.js)?/(\\d+\\.\\d+\\.\\d+)/", "moment@(\\d+\\.\\d+\\.\\d+)"],
+      "contentPatterns": ["moment\\.js[\\s\\S]{0,40}version\\s*:\\s*(\\d+\\.\\d+\\.\\d+)"],
+      "vulnerabilities": [
+        { "below": "2.19.3", "severity": "Low", "identifiers": ["CVE-2017-18214"], "summary": "ReDoS in date parsing" },
+        { "below": "2.29.2", "severity": "Low", "identifiers": ["CVE-2022-24785"], "summary": "Path traversal in locale loading (server-side usage)" },
+        { "atOrAbove": "2.18.0", "below": "2.29.4", "severity": "Low", "identifiers": ["CVE-2022-31129"], "summary": "ReDoS in RFC 2822 parsing" }
+      ]
+    },
+    {
+      "name": "handlebars",
+      "displayName": "Handlebars",
+      "urlPatterns": ["handlebars[.-]v?(\\d+\\.\\d+\\.\\d+)(?:\\.min)?\\.js", "/handlebars(?:\\.js)?/(\\d+\\.\\d+\\.\\d+)/", "handlebars@(\\d+\\.\\d+\\.\\d+)"],
+      "contentPatterns": ["handlebars v(\\d+\\.\\d+\\.\\d+)"],
+      "vulnerabilities": [
+        { "below": "4.3.0", "severity": "High", "identifiers": ["CVE-2019-19919"], "summary": "Prototype pollution leading to code execution" },
+        { "below": "4.7.7", "severity": "High", "identifiers": ["CVE-2021-23369", "CVE-2021-23383"], "summary": "Code execution when compiling untrusted templates" }
+      ]
+    },
+    {
+      "name": "dompurify",
+      "displayName": "DOMPurify",
+      "urlPatterns": ["/dompurify/(\\d+\\.\\d+\\.\\d+)/", "dompurify@(\\d+\\.\\d+\\.\\d+)", "purify[.-](\\d+\\.\\d+\\.\\d+)(?:\\.min)?\\.js"],
+      "contentPatterns": ["DOMPurify (\\d+\\.\\d+\\.\\d+)"],
+      "vulnerabilities": [
+        { "below": "2.0.17", "severity": "Medium", "identifiers": ["CVE-2020-26870"], "summary": "Mutation XSS bypass" },
+        { "below": "2.5.4", "severity": "Medium", "identifiers": ["CVE-2024-45801"], "summary": "Nesting-depth check bypass and prototype pollution" },
+        { "atOrAbove": "3.0.0", "below": "3.1.3", "severity": "Medium", "identifiers": ["CVE-2024-45801"], "summary": "Nesting-depth check bypass and prototype pollution" }
+      ]
+    }
+  ]
+}
