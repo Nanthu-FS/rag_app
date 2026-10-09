@@ -411,3 +411,74 @@ body.intro #cats, body.focused #cats, body.v-drives #cats, body.v-scanning #cats
 body.ready #gv { transition: filter .45s cubic-bezier(.2,.7,.2,1), transform .45s cubic-bezier(.2,.7,.2,1); }
 body.warp #gv { filter: blur(10px) brightness(1.35); transform: scale(1.04); transition: none; }
 #results { background: linear-gradient(180deg, rgba(14,28,28,.96), rgba(6,14,14,.98)); }
+
+/* =========================================================
+   Clean / professional pass
+   ========================================================= */
+:root { --cond: var(--font); }
+body { font-feature-settings: "tnum" 1, "cv11" 1; }
+.glass { box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 18px 50px rgba(0,0,0,.45); border-color: rgba(255,255,255,.07); }
+.logo b { font-weight: 600; letter-spacing: 0; }
+
+.kpi .v { font: 600 18px var(--font); letter-spacing: -.2px; }
+.kpi:first-child::before { box-shadow: none; height: 2px; }
+.kpi small { font-size: 11px; letter-spacing: .2px; }
+
+#tip { padding: 12px 14px; }
+#tip h4 { font: 600 13.5px var(--font); }
+#tip .hint { color: #b9a07a; }
+.tag { border-radius: 5px; font-weight: 500; }
+
+.pulse-btn.on, .pulse-btn:hover { box-shadow: none; }
+.btn-gold:hover { box-shadow: none; }
+
+/* insights cards: accent bar instead of bracket glyph */
+.card-i { padding: 14px 18px; border-left: 2px solid var(--teal); background: rgba(255,255,255,.03); }
+.card-i::before { display: none; }
+.card-i.crit { background: rgba(255,110,120,.06); border-left-color: var(--red); }
+.card-i.warn { border-left-color: var(--amber); }
+.card-i .h, .card-i p, .repo-chips { padding-left: 0; }
+.card-i .h b { font-size: 14px; font-weight: 600; }
+.ins-head h3 { font: 600 12px var(--font); letter-spacing: 1.2px; color: var(--muted); }
+.ins-head h3 b { color: var(--text); }
+
+/* category panel */
+#cats { width: 220px; padding: 12px; gap: 2px; }
+#cats h5 { padding: 0 8px 8px; }
+#cats button { flex-wrap: wrap; row-gap: 5px; padding: 7px 8px; }
+#cats button i { box-shadow: none !important; width: 8px; height: 8px; }
+#cats button b { color: #c9d6d3; font-weight: 500; }
+#cats button s { flex-basis: 100%; height: 2px; border-radius: 2px; background: rgba(255,255,255,.06); text-decoration: none; overflow: hidden; }
+#cats button s::after { content: ""; display: block; height: 100%; width: var(--w); background: var(--c); }
+
+/* focus view */
+.f-head h1 { font: 600 20px/1.2 var(--font); letter-spacing: -.2px; }
+.f-head p { font: 500 13px var(--font); color: var(--muted); margin-top: 2px; }
+.f-head p b { font-weight: 600; }
+.skew { transform: none; border-radius: 6px; background: rgba(255,255,255,.06); border: 1px solid var(--stroke); font: 600 10.5px var(--font); letter-spacing: .8px; color: var(--muted); padding: 4px 10px; }
+.skew > span { transform: none; }
+.skew b { color: var(--text); }
+.meter { display: none; }
+.f-card { height: 56px; border-radius: 10px; background: rgba(14,28,27,.82); box-shadow: none; }
+.f-card .n { font: 600 17px/1.1 var(--font); letter-spacing: -.2px; }
+.f-card.on { border: 1px solid rgba(232,195,138,.8); box-shadow: none; background: rgba(40,36,26,.55); }
+.f-card:hover { transform: none; border-color: rgba(255,255,255,.16); }
+.f-item .t { font: 500 13px var(--font); letter-spacing: 0; }
+.f-item .m .tag { transform: none; background: rgba(255,255,255,.07); color: #dbe6e4; font-size: 10px; }
+.f-item .bar { height: 4px; border-radius: 2px; box-shadow: none; opacity: .8; }
+.f-item .m .who { color: #8ea4a1; }
+
+.panel { background: rgba(10,22,21,.86); }
+.p-health, .p-health.good, .p-health.mid { background: rgba(255,255,255,.03); }
+.ph-main .big { font-weight: 300; }
+.ph-top .pill { border-color: var(--stroke-2); color: var(--muted); background: none; }
+.stack i { box-shadow: none; }
+.legend i { box-shadow: none; }
+.p-ins .it { background: rgba(255,255,255,.025); }
+.p-actions button.primary { background: rgba(111,227,201,.14); color: var(--teal); }
+.p-actions button.primary svg { color: var(--teal); }
+
+#hud .big { font-weight: 200; letter-spacing: -2px; }
+#drivesHint h2 { font: 600 22px var(--font); letter-spacing: -.3px; }
+#drivesHint p { font-size: 13px; }
+.crumbs button.cur { font-weight: 600; }
