@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RepoPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Condensed:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="intro">
+  <canvas id="gv" class="layer"></canvas>
+  <canvas id="fx" class="layer"></canvas>
+
+  <header id="top">
+    <div class="brand">
+      <button class="sq" id="menuBtn" title="Folders" data-i="menu"></button>
+      <div class="logo">
+        <svg viewBox="0 0 36 36" fill="none">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#f6dcae"/><stop offset="1" stop-color="#c8955a"/></linearGradient></defs>
+          <path d="M12 5H8a3 3 0 0 0-3 3v4M24 5h4a3 3 0 0 1 3 3v4M12 31H8a3 3 0 0 1-3-3v-4M24 31h4a3 3 0 0 0 3-3v-4" stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M18 9.5l2.3 6.2 6.2 2.3-6.2 2.3L18 26.5l-2.3-6.2L9.5 18l6.2-2.3z" fill="url(#lg)"/>
+        </svg>
+        <div><b>RepoPulse</b><span>Git Command Center</span></div>
+      </div>
+    </div>
+    <nav class="tools">
+      <div class="tg">
+        <button id="modeRadial" class="on" title="Constellation view" data-i="graph"></button>
+        <button id="modeStatus" title="Cluster by status" data-i="tree"></button>
+      </div>
+      <div class="tg">
+        <button id="zoomIn" title="Zoom in" data-i="plus"></button>
+        <button id="zoomOut" title="Zoom out" data-i="minus"></button>
+      </div>
+      <div class="tg"><button id="filterBtn" title="Filter" data-i="filter"><span class="dot" id="filterDot"></span></button></div>
+      <div class="tg"><button id="sortBtn" title="Sort" data-i="sort"><span class="dot show" id="sortDot">H</span></button></div>
+      <div class="tg"><button id="scanBtn" title="Rescan (R)" data-i="scan"></button></div>
+    </nav>
+    <div class="right">
+      <div class="status"><span class="led"></span><span id="statusText">Ready</span></div>
+      <button class="btn-gold" id="addRootBtn"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add Folder</button>
+      <button class="round" id="fetchAllBtn" title="Fetch all" data-i="sync"></button>
+      <button class="round" id="searchBtn" title="Search (/)" data-i="search"></button>
+      <div class="avatar"><i id="avatar">G</i><svg class="i" viewBox="0 0 24 24" style="width:13px;height:13px;color:#8ea4a1"><path d="M6 9l6 6 6-6"/></svg></div>
+    </div>
+  </header>
+
+  <section id="insights" class="glass">
+    <div class="ins-head"><h3><b>PULSE</b> ANALYSIS</h3><button class="x" id="insClose" data-i="close"></button></div>
+    <div class="ins-list" id="insList"></div>
+  </section>
+
+  <section id="dock" class="glass">
+    <div class="kpis">
+      <div class="kpi"><small>Repositories</small><div class="v" data-i="layers"><span id="kRepos">0</span></div></div>
+      <div class="kpi"><small>Avg Health</small><div class="v" data-i="pulse"><span id="kHealth">0</span><em>%</em></div></div>
+      <div class="kpi"><small>Need Attention</small><div class="v" data-i="alert"><span id="kAttn">0</span></div></div>
+      <div class="kpi"><small>Unpushed Commits</small><div class="v" data-i="upload"><span id="kAhead">0</span></div></div>
+    </div>
+    <div class="ask-wrap">
+      <form class="ask" id="askForm" autocomplete="off">
+        <input id="ask" placeholder="Search repos or run a command — fetch all, pull api, code web…" spellcheck="false">
+        <button class="send" type="submit" data-i="send"></button>
+      </form>
+    </div>
+    <div class="dock-row">
+      <button class="chip" id="rootsChip"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span id="rootsLabel">Workspace</span><svg class="i chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button class="chip" id="attnChip" title="Show repos needing attention"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5M12 15.8v.01"/></svg><span id="attnLabel">+0</span></button>
+      <div class="spacer"></div>
+      <button class="pulse-btn" id="pulseBtn" data-i="sparkleWave"><span>Pulse Analysis</span></button>
+    </div>
+  </section>
+
+  <section id="focus">
+    <button class="back glass" id="backBtn" data-i="back"><span>Overview</span></button>
+    <div class="f-head" id="fHead"></div>
+    <div class="f-meta" id="fMeta"></div>
+    <div id="fCards"></div>
+    <div id="fItems"></div>
+    <div class="f-crumb glass" id="fCrumb"></div>
+    <aside class="panel glass" id="fPanel"></aside>
+  </section>
+
+  <div id="tip" class="glass"></div>
+  <div id="empty">
+    <h2>No repositories found</h2>
+    <p>Point RepoPulse at the folders where you keep your code.</p>
+    <button class="btn-gold" id="emptyAdd"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add Folder</button>
+  </div>
+  <div class="pop glass" id="filterPop"></div>
+  <div class="pop glass" id="sortPop"></div>
+  <div class="pop glass" id="rootsPop"></div>
+  <div id="toasts"></div>
+  <div class="demo-flag" id="demoFlag" hidden>DEMO DATA · run app.py for live repos</div>
+
+  <script src="app.js"></script>
+</body>
+</html>

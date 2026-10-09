@@ -1,7 +1,7 @@
 # Windows App Ideas
 
 ## ⭐ Picked
-**Git Repo Dashboard**: one window showing the status of every local repo: branch, uncommitted changes, ahead/behind remote, last commit. Includes one-click fetch, pull and open in editor.
+**Git Repo Dashboard** (built: [`git_dashboard/`](git_dashboard/)): one window showing the status of every local repo: branch, uncommitted changes, ahead/behind remote, last commit. Includes one-click fetch, pull and open in editor.
 
 ## More Ideas
 
