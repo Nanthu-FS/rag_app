@@ -1,0 +1,54 @@
+name: Build DiskPulse.exe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "disk_visualizer/**"
+      - ".github/workflows/build-diskpulse.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: disk_visualizer
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build exe
+        run: python -m PyInstaller --noconfirm --windowed --onefile --name DiskPulse --add-data "ui;ui" app.py
+
+      - name: Smoke test bundle contents
+        shell: pwsh
+        run: |
+          if (-not (Test-Path dist/DiskPulse.exe)) { throw "exe missing" }
+          "{0:N1} MB" -f ((Get-Item dist/DiskPulse.exe).Length / 1MB)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DiskPulse
+          path: disk_visualizer/dist/DiskPulse.exe
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: diskpulse-latest
+          name: DiskPulse (latest build)
+          body: |
+            Windows build of DiskPulse, the disk space visualizer.
+            Download `DiskPulse.exe` and run it.
+            Built from ${{ github.sha }}.
+          prerelease: true
+          make_latest: false
+          files: disk_visualizer/dist/DiskPulse.exe

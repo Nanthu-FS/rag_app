@@ -27,7 +27,7 @@
 17. **Time Tracker**: automatically logs time spent per app or project
 
 ### System utilities
-18. **Disk Space Visualizer**: treemap of largest folders and files
+18. **Disk Space Visualizer** (built: [`disk_visualizer/`](disk_visualizer/)): treemap of largest folders and files
 19. **Bulk File Renamer**: patterns, previews and undo
 20. **Downloads Auto-Organizer**: sorts files into folders by type or date
 21. **Startup Manager**: control which apps launch at boot, with impact scores

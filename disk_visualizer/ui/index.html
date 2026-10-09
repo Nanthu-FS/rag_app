@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DiskPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Condensed:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="intro v-drives">
+  <canvas id="gv" class="layer"></canvas>
+  <canvas id="fx" class="layer"></canvas>
+
+  <header id="top">
+    <div class="brand">
+      <button class="sq" id="homeBtn" title="Drives" data-i="menu"></button>
+      <div class="logo">
+        <svg viewBox="0 0 36 36" fill="none">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#f6dcae"/><stop offset="1" stop-color="#c8955a"/></linearGradient></defs>
+          <path d="M12 5H8a3 3 0 0 0-3 3v4M24 5h4a3 3 0 0 1 3 3v4M12 31H8a3 3 0 0 1-3-3v-4M24 31h4a3 3 0 0 0 3-3v-4" stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="18" cy="18" r="7.5" stroke="url(#lg)" stroke-width="2"/>
+          <path d="M18 10.5A7.5 7.5 0 0 1 25.5 18H18z" fill="url(#lg)"/>
+        </svg>
+        <div><b>DiskPulse</b><span>Storage Visualizer</span></div>
+      </div>
+    </div>
+    <nav class="tools">
+      <div class="tg">
+        <button id="modeOrbit" class="on" title="Constellation view" data-i="graph"></button>
+        <button id="modeRings" title="Sunburst view" data-i="rings"></button>
+      </div>
+      <div class="tg">
+        <button id="zoomIn" title="Zoom in" data-i="plus"></button>
+        <button id="zoomOut" title="Zoom out" data-i="minus"></button>
+      </div>
+      <div class="tg"><button id="upBtn" title="Up one level (Backspace)" data-i="up"></button></div>
+      <div class="tg"><button id="detailsBtn" title="Folder details (D)" data-i="details"></button></div>
+      <div class="tg"><button id="rescanBtn" title="Rescan (R)" data-i="scan"></button></div>
+    </nav>
+    <div class="right">
+      <div class="status"><span class="led"></span><span id="statusText">Ready</span></div>
+      <button class="btn-gold" id="scanFolderBtn"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Scan Folder</button>
+      <button class="round" id="searchBtn" title="Search (/)" data-i="search"></button>
+      <div class="avatar"><i id="avatar">U</i><svg class="i" viewBox="0 0 24 24" style="width:13px;height:13px;color:#8ea4a1"><path d="M6 9l6 6 6-6"/></svg></div>
+    </div>
+  </header>
+
+  <div class="crumbs glass" id="crumbs"></div>
+  <div id="drivesHint"><h2>Choose a drive to scan</h2><p>or pick any folder with <b style="color:var(--gold);font-weight:500">Scan Folder</b></p></div>
+  <div id="cats" class="glass"></div>
+
+  <div id="hud">
+    <div class="big" id="hudBytes">0<em>GB</em></div>
+    <div class="sub"><b id="hudFiles">0</b> files scanned · <span id="hudTime">0s</span></div>
+    <div class="path" id="hudPath"></div>
+    <button class="ghost" id="stopBtn">Stop scan</button>
+  </div>
+
+  <section id="insights" class="glass">
+    <div class="ins-head"><h3><b>PULSE</b> ANALYSIS</h3><button class="x" id="insClose" data-i="close"></button></div>
+    <div class="ins-list" id="insList"></div>
+  </section>
+
+  <section id="dock" class="glass">
+    <div class="kpis">
+      <div class="kpi"><small id="k1l">Drives</small><div class="v" data-i="disk"><span id="k1">0</span><em id="k1u"></em></div></div>
+      <div class="kpi"><small id="k2l">Total Capacity</small><div class="v" data-i="file"><span id="k2">0</span><em id="k2u"></em></div></div>
+      <div class="kpi"><small id="k3l">Used</small><div class="v" data-i="folder"><span id="k3">0</span><em id="k3u"></em></div></div>
+      <div class="kpi"><small id="k4l">Free Space</small><div class="v" data-i="pie"><span id="k4">0</span><em id="k4u"></em></div></div>
+    </div>
+    <div class="ask-wrap">
+      <form class="ask" id="askForm" autocomplete="off">
+        <input id="ask" placeholder="Search folders & files — node_modules, .mp4, Downloads…" spellcheck="false">
+        <button class="send" type="submit" data-i="send"></button>
+      </form>
+    </div>
+    <div class="dock-row">
+      <button class="chip" id="driveChip"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 14h.01M11 14h6"/></svg><span id="driveLabel">Drives</span><svg class="i chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button class="chip" id="upChip" title="Up one level"><svg class="i" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span>Up</span></button>
+      <div class="spacer"></div>
+      <button class="pulse-btn" id="pulseBtn" data-i="sparkleWave"><span>Pulse Analysis</span></button>
+    </div>
+  </section>
+
+  <section id="focus">
+    <button class="back glass" id="backBtn" data-i="back"><span>Constellation</span></button>
+    <div class="f-head" id="fHead"></div>
+    <div class="f-meta" id="fMeta"></div>
+    <div id="fCards"></div>
+    <div id="fItems"></div>
+    <div class="f-crumb glass" id="fCrumb"></div>
+    <aside class="panel glass" id="fPanel"></aside>
+  </section>
+
+  <div id="tip" class="glass"></div>
+  <div class="pop glass" id="drivePop"></div>
+  <div class="pop glass" id="results"></div>
+  <div id="modal"><div class="box glass"><h3 id="mTitle"></h3><p id="mText"></p><div class="row"><button class="ghost" id="mCancel">Cancel</button><button class="ghost danger" id="mOk">Move to Recycle Bin</button></div></div></div>
+  <div id="toasts"></div>
+  <div class="demo-flag" id="demoFlag" hidden>DEMO DATA · run app.py for your real disks</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
