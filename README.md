@@ -6,6 +6,7 @@ Built with [Streamlit](https://streamlit.io), [LangChain](https://www.langchain.
 
 ## Features
 
+- 📁 **Ask my folder**: point it at a folder on your PC and ask questions about everything in it
 - 📄 Ingest **PDF, TXT, and DOCX** files (multiple at once)
 - 🔍 Semantic retrieval over your documents with a persistent Chroma vector store
 - 💬 Streaming chat responses grounded strictly in retrieved context
@@ -55,6 +56,15 @@ On Windows you can also just double-click **`run.bat`**.
 The app opens at <http://localhost:8501>.
 
 ## Usage
+
+### Ask my folder
+
+1. Paste a folder path (e.g. `C:\Users\you\Documents\Notes`) into **Folder path** and click **Index folder**.
+   PDF, DOCX, TXT, Markdown and plain-text/code files in it and its subfolders are indexed (hidden folders, `.git`, `node_modules` and files over 50 MB are skipped).
+2. Pick the folder under **Ask questions about** and ask away. Answers cite sources as `[1]`, `[2]`; expand **Sources** to see the file, page and full path.
+3. Click **Re-sync** after files change. Only new or edited files are re-read; deleted files are dropped. **Remove** takes the folder out of the index.
+
+### Upload files
 
 1. In the sidebar, choose your **LLM** and **embedding** models and the number of chunks to retrieve (top-k).
 2. Upload one or more documents and click **Ingest Documents**.
