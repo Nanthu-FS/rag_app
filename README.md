@@ -21,11 +21,11 @@ Built with [Streamlit](https://streamlit.io), [LangChain](https://www.langchain.
 Pull the models used by the app (defaults shown):
 
 ```bash
-ollama pull llama3.2:3b
-ollama pull nomic-embed-text
+ollama pull gpt-oss:20b
+ollama pull qwen3-embedding:0.6b
 ```
 
-You can also use `llama3:latest` or `mistral-small3.2:24b` — just select them in the sidebar (and pull them first).
+The defaults fit a 16 GB GPU. You can also pick `qwen3:14b`, `qwen3:30b-a3b`, `llama3.2:3b`, `llama3:latest`, or `mistral-small3.2:24b`, and `qwen3-embedding:4b` or `nomic-embed-text` for embeddings — just select them in the sidebar (and pull them first). Each embedding model keeps its own index under `./chroma_db`, so re-ingest your files after switching.
 
 ## Setup
 

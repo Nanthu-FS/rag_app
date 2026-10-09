@@ -302,6 +302,11 @@ def load_document(uploaded_file) -> list:
         os.unlink(tmp_path)
 
 
+def chroma_dir_for(embed_model: str) -> str:
+    # one index per embedding model: vectors from different models aren't compatible
+    return os.path.join(CHROMA_DIR, embed_model.replace(":", "_").replace("/", "_"))
+
+
 def build_vectorstore(docs: list, embed_model: str) -> Chroma:
     splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
     chunks = splitter.split_documents(docs)
@@ -309,14 +314,15 @@ def build_vectorstore(docs: list, embed_model: str) -> Chroma:
     return Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,
-        persist_directory=CHROMA_DIR,
+        persist_directory=chroma_dir_for(embed_model),
     )
 
 
 def load_existing_vectorstore(embed_model: str) -> Chroma | None:
-    if os.path.exists(CHROMA_DIR):
+    persist_dir = chroma_dir_for(embed_model)
+    if os.path.exists(persist_dir):
         embeddings = OllamaEmbeddings(model=embed_model)
-        vs = Chroma(persist_directory=CHROMA_DIR, embedding_function=embeddings)
+        vs = Chroma(persist_directory=persist_dir, embedding_function=embeddings)
         if vs._collection.count() > 0:
             return vs
     return None
@@ -370,12 +376,12 @@ with st.sidebar:
     st.markdown('<div class="sidebar-heading">Models</div>', unsafe_allow_html=True)
     llm_model = st.selectbox(
         "LLM Model",
-        ["llama3.2:3b", "llama3:latest", "mistral-small3.2:24b"],
+        ["gpt-oss:20b", "qwen3:14b", "qwen3:30b-a3b", "llama3.2:3b", "llama3:latest", "mistral-small3.2:24b"],
         index=0,
     )
     embed_model = st.selectbox(
         "Embedding Model",
-        ["nomic-embed-text:latest"],
+        ["qwen3-embedding:0.6b", "qwen3-embedding:4b", "nomic-embed-text:latest"],
         index=0,
     )
     top_k = st.slider("Retrieved chunks (top-k)", 1, 8, 4)
