@@ -1,3 +1,4 @@
+import html
 import os
 import tempfile
 import streamlit as st
@@ -8,7 +9,8 @@ from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2t
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+
+import folder_index
 
 CHROMA_DIR = "./chroma_db"
 
@@ -251,6 +253,13 @@ section[data-testid="stFileUploaderDropzone"] {
     border-radius: 5px;
     padding: 1px 7px;
 }
+.source-path {
+    margin-top: 6px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    word-break: break-all;
+}
 
 /* ── Chat input ────────────────────────────────────────────────────────── */
 [data-testid="stChatInput"] {
@@ -269,7 +278,7 @@ section[data-testid="stFileUploaderDropzone"] {
 def init_state():
     defaults = {
         "messages": [],
-        "vectorstore": None,
+        "active_folder": None,
         "docs_loaded": False,
         "doc_names": [],
     }
@@ -307,60 +316,60 @@ def chroma_dir_for(embed_model: str) -> str:
     return os.path.join(CHROMA_DIR, embed_model.replace(":", "_").replace("/", "_"))
 
 
-def build_vectorstore(docs: list, embed_model: str) -> Chroma:
-    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
-    chunks = splitter.split_documents(docs)
-    embeddings = OllamaEmbeddings(model=embed_model)
-    return Chroma.from_documents(
-        documents=chunks,
-        embedding=embeddings,
+@st.cache_resource(show_spinner=False)
+def open_store(embed_model: str) -> Chroma:
+    # one shared client per embedding model, reused by uploads and folder indexing
+    return Chroma(
         persist_directory=chroma_dir_for(embed_model),
+        embedding_function=OllamaEmbeddings(model=embed_model),
     )
 
 
-def load_existing_vectorstore(embed_model: str) -> Chroma | None:
-    persist_dir = chroma_dir_for(embed_model)
-    if os.path.exists(persist_dir):
-        embeddings = OllamaEmbeddings(model=embed_model)
-        vs = Chroma(persist_directory=persist_dir, embedding_function=embeddings)
-        if vs._collection.count() > 0:
-            return vs
-    return None
+def add_uploaded_docs(docs: list, embed_model: str):
+    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
+    open_store(embed_model).add_documents(splitter.split_documents(docs))
 
 
-def make_chain(vectorstore: Chroma, llm_model: str, top_k: int):
-    retriever = vectorstore.as_retriever(search_kwargs={"k": top_k})
-    llm = OllamaLLM(model=llm_model, temperature=0.1)
+PROMPT = ChatPromptTemplate.from_template("""You are a helpful assistant answering questions about the user's files.
+Answer using ONLY the numbered sources below. After each claim, cite the source number in square brackets, like [1] or [2][3].
+If the answer is not in the sources, say "I don't have enough information to answer that."
 
-    prompt = ChatPromptTemplate.from_template("""You are a helpful assistant. Answer the question using ONLY the provided context.
-If the answer is not in the context, say "I don't have enough information to answer that."
-
-Context:
+Sources:
 {context}
 
 Question: {question}
 
 Answer:""")
 
-    def format_docs(docs):
-        return "\n\n".join(d.page_content for d in docs)
 
-    chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | prompt
-        | llm
-        | StrOutputParser()
+def retrieve(vectorstore: Chroma, question: str, top_k: int, folder: str | None) -> list:
+    kwargs = {"k": top_k}
+    if folder:
+        kwargs["filter"] = {"folder": folder}
+    return vectorstore.similarity_search(question, **kwargs)
+
+
+def answer_stream(docs: list, question: str, llm_model: str):
+    context = "\n\n".join(
+        f"[{i}] {d.metadata.get('source', 'unknown')}"
+        + (f" (page {d.metadata['page']})" if d.metadata.get("page") not in (None, "") else "")
+        + f"\n{d.page_content}"
+        for i, d in enumerate(docs, 1)
     )
-    return chain, retriever
+    llm = OllamaLLM(model=llm_model, temperature=0.1)
+    return (PROMPT | llm | StrOutputParser()).stream({"context": context, "question": question})
 
 
 def render_sources(sources: list):
     for src in sources:
         st.markdown(
             f'<div class="source-box"><div class="source-title">'
-            f'<span>{src["source"]}</span>'
-            f'<span class="page-tag">page {src.get("page", "?")}</span></div>'
-            f'{src["snippet"]}</div>',
+            + f'<span>[{src.get("n", "")}] {html.escape(str(src["source"]))}</span>'
+            + (f'<span class="page-tag">page {src["page"]}</span>' if src.get("page") not in (None, "") else "")
+            + '</div>'
+            f'{html.escape(src["snippet"])}'
+            + (f'<div class="source-path">{html.escape(src["path"])}</div>' if src.get("path") else "")
+            + '</div>',
             unsafe_allow_html=True,
         )
 
@@ -386,6 +395,67 @@ with st.sidebar:
     )
     top_k = st.slider("Retrieved chunks (top-k)", 1, 8, 4)
 
+    store = open_store(embed_model)
+    persist_dir = chroma_dir_for(embed_model)
+
+    st.divider()
+    st.markdown('<div class="sidebar-heading">Ask my folder</div>', unsafe_allow_html=True)
+
+    folder_input = st.text_input(
+        "Folder path",
+        placeholder=r"C:\Users\you\Documents\Notes",
+        help="Every PDF, DOCX, TXT, MD and text/code file inside (including subfolders) gets indexed. "
+             "Re-indexing only re-reads files that changed.",
+    )
+    if st.button("Index folder", use_container_width=True, type="primary", disabled=not folder_input.strip()):
+        folder = folder_index.normalize(folder_input)
+        if not os.path.isdir(folder):
+            st.error(f"Folder not found: {folder}")
+        else:
+            bar = st.progress(0, text="Scanning folder…")
+            try:
+                stats = folder_index.index_folder(
+                    folder, store, persist_dir,
+                    progress=lambda p, name: bar.progress(p, text=f"Indexing {name}"),
+                )
+            except Exception as e:
+                bar.empty()
+                st.error(f"Indexing failed: {e}")
+            else:
+                bar.empty()
+                st.session_state.active_folder = folder
+                st.success(
+                    f"{stats['files']} files · {stats['added']} new, {stats['updated']} updated, "
+                    f"{stats['removed']} removed"
+                )
+                if stats["failed"]:
+                    with st.expander(f"{len(stats['failed'])} file(s) skipped"):
+                        st.code("\n".join(stats["failed"]))
+
+    folders = folder_index.indexed_folders(persist_dir)
+    if folders:
+        scope_options = ["All indexed content"] + list(folders)
+        current = st.session_state.get("active_folder")
+        scope = st.selectbox(
+            "Ask questions about",
+            scope_options,
+            index=scope_options.index(current) if current in scope_options else 0,
+            format_func=lambda f: f if f == scope_options[0] else f"{os.path.basename(f) or f} ({folders[f]} files)",
+        )
+        st.session_state.active_folder = None if scope == scope_options[0] else scope
+        if st.session_state.active_folder:
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("Re-sync", use_container_width=True, help="Pick up new, edited and deleted files"):
+                    with st.spinner("Re-syncing…"):
+                        folder_index.index_folder(st.session_state.active_folder, store, persist_dir)
+                    st.rerun()
+            with c2:
+                if st.button("Remove", use_container_width=True, help="Drop this folder from the index"):
+                    folder_index.forget_folder(st.session_state.active_folder, store, persist_dir)
+                    st.session_state.active_folder = None
+                    st.rerun()
+
     st.divider()
     st.markdown('<div class="sidebar-heading">Documents</div>', unsafe_allow_html=True)
 
@@ -396,7 +466,7 @@ with st.sidebar:
         help="PDF, TXT, or DOCX files",
     )
 
-    if st.button("Ingest Documents", use_container_width=True, type="primary", disabled=not uploaded_files):
+    if st.button("Ingest Documents", use_container_width=True, disabled=not uploaded_files):
         all_docs = []
         progress = st.progress(0, text="Loading files…")
         for i, f in enumerate(uploaded_files):
@@ -409,18 +479,12 @@ with st.sidebar:
 
         if all_docs:
             with st.spinner("Building vector index…"):
-                st.session_state.vectorstore = build_vectorstore(all_docs, embed_model)
-                st.session_state.docs_loaded = True
+                add_uploaded_docs(all_docs, embed_model)
                 st.session_state.doc_names = list({f.name for f in uploaded_files})
             progress.empty()
             st.success(f"Indexed {len(all_docs)} pages from {len(uploaded_files)} file(s)")
 
-    # try loading persisted store if none in session
-    if not st.session_state.vectorstore:
-        vs = load_existing_vectorstore(embed_model)
-        if vs:
-            st.session_state.vectorstore = vs
-            st.session_state.docs_loaded = True
+    st.session_state.docs_loaded = store._collection.count() > 0
 
     if st.session_state.docs_loaded:
         st.markdown(
@@ -443,13 +507,15 @@ with st.sidebar:
             st.rerun()
     with col2:
         if st.button("Reset index", use_container_width=True):
-            st.session_state.vectorstore = None
+            # empty the collection in place: deleting files under an open client breaks it (and is locked on Windows)
+            ids = store.get(include=[])["ids"]
+            for i in range(0, len(ids), 5000):
+                store.delete(ids=ids[i:i + 5000])
+            folder_index.save_manifest(persist_dir, {})
             st.session_state.docs_loaded = False
             st.session_state.doc_names = []
+            st.session_state.active_folder = None
             st.session_state.messages = []
-            if os.path.exists(CHROMA_DIR):
-                import shutil
-                shutil.rmtree(CHROMA_DIR)
             st.rerun()
 
 
@@ -459,7 +525,7 @@ st.markdown(
     '<div class="app-header">'
     '<div class="app-mark">◆</div>'
     '<div><div class="app-title">RAG Chat</div>'
-    '<div class="app-sub">Ask questions grounded in your documents</div></div>'
+    '<div class="app-sub">Point it at a folder, ask questions, get cited answers</div></div>'
     '</div>',
     unsafe_allow_html=True,
 )
@@ -478,7 +544,7 @@ if not st.session_state.docs_loaded:
         '<div class="empty-state">'
         '<div class="es-mark">◆</div>'
         '<h3>No documents indexed yet</h3>'
-        '<p>Upload files in the sidebar and click Ingest Documents to begin.</p>'
+        '<p>Paste a folder path in the sidebar and click Index folder, or upload files.</p>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -490,7 +556,7 @@ for msg in st.session_state.messages:
             with st.expander("Sources", expanded=False):
                 render_sources(msg["sources"])
 
-if prompt := st.chat_input("Ask something about your documents…", disabled=not st.session_state.docs_loaded):
+if prompt := st.chat_input("Ask something about your files…", disabled=not st.session_state.docs_loaded):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -499,28 +565,24 @@ if prompt := st.chat_input("Ask something about your documents…", disabled=not
         placeholder = st.empty()
         placeholder.markdown("_Thinking…_")
 
-        chain, retriever = make_chain(st.session_state.vectorstore, llm_model, top_k)
+        source_docs = retrieve(store, prompt, top_k, st.session_state.active_folder)
 
-        # stream response
         full_response = ""
-        for chunk in chain.stream(prompt):
-            full_response += chunk
-            placeholder.markdown(full_response + "▌")
+        if not source_docs:
+            full_response = "I couldn't find anything relevant in the indexed files."
+        else:
+            for chunk in answer_stream(source_docs, prompt, llm_model):
+                full_response += chunk
+                placeholder.markdown(full_response + "▌")
         placeholder.markdown(full_response)
 
-        # collect source metadata
-        source_docs = retriever.invoke(prompt)
-        sources = []
-        seen = set()
-        for doc in source_docs:
-            key = (doc.metadata.get("source", ""), doc.page_content[:80])
-            if key not in seen:
-                seen.add(key)
-                sources.append({
-                    "source": doc.metadata.get("source", "unknown"),
-                    "page": doc.metadata.get("page", "?"),
-                    "snippet": doc.page_content[:300] + ("…" if len(doc.page_content) > 300 else ""),
-                })
+        sources = [{
+            "n": i,
+            "source": doc.metadata.get("source", "unknown"),
+            "path": doc.metadata.get("source_path", ""),
+            "page": doc.metadata.get("page", ""),
+            "snippet": doc.page_content[:300] + ("…" if len(doc.page_content) > 300 else ""),
+        } for i, doc in enumerate(source_docs, 1)]
 
         if sources:
             with st.expander("Sources", expanded=False):
